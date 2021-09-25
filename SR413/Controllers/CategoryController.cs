@@ -58,6 +58,11 @@ namespace SR413.Controllers
         {
             if (ModelState.IsValid)
             {
+                if(await IsCategoryExist(category.CategoryName))
+                {
+                    ViewData["ErrorMgs"] = "This category is already exist";
+                    return View(category);
+                }
                 category.CategoryId = Guid.NewGuid();
                 _context.Add(category);
                 await _context.SaveChangesAsync();
@@ -66,6 +71,8 @@ namespace SR413.Controllers
             return View(category);
         }
 
+        private async Task<bool> IsCategoryExist(string name)
+            => await _context.Category.AnyAsync(x => x.CategoryName.Equals(name));
         // GET: Category/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
